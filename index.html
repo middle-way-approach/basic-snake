@@ -23,6 +23,10 @@ limitations under the License.
 
 init:
 SCREEN(0)
+w = 40
+h = 20
+length = 5
+debug = 0
 DIM x(1000) = { 2, 2, 2, 2, 2 }
 x(0) = 2
 DIM y(1000) = { 5, 4, 3, 2, 1 }
@@ -30,10 +34,8 @@ y(0) = 5
 DIM direction(2) = {0,1}
 direction(0) = 0
 direction(1) = 1
-DIM target(2) = {10, 10}
-w = 64
-h = 20
-length = 5
+DIM target(2)
+GOSUB spawn_target
 
 game_loop:
 CLS
@@ -41,11 +43,18 @@ GOSUB draw_stuff
 GOSUB move_snake
 GOSUB check_collision
 GOSUB catch_direction
-SLEEP 100
+SLEEP 88
 GOTO game_loop
 
+draw_edge:
+LINE (0,0)-(w*10 - 1,h*10 - 1),5,B
+LINE (w*10,0)-(640,h*10 - 1),5,B
+RETURN
+
 draw_stuff:
-GOSUB draw_debug
+GOSUB draw_score
+GOSUB draw_edge
+IF debug = 1 THEN GOSUB draw_debug
 GOSUB draw_snake
 GOSUB draw_target
 RETURN
@@ -56,6 +65,12 @@ PRINT target(0), target(1)
 PRINT length
 RETURN
 
+draw_score:
+PRINT
+PRINT TAB(54), "BASIC SNAKE"
+PRINT TAB(54), "SCORE: " + (length - 5)
+RETURN
+
 draw_snake:
 FOR i=0 to length - 1
     CIRCLE (x(i) * 10, y(i) * 10), 7, 2,,,,F
@@ -64,6 +79,12 @@ RETURN
 
 draw_target: 
 CIRCLE (target(0) * 10, target(1) * 10), 5, 4,,,,F
+RETURN
+
+draw_game_over:
+PRINT TAB(54), CHR$(1),"GAME OVER", CHR$(2)
+PRINT TAB(54),"Press R to restart"
+RETURN
 
 check_collision:
 IF x(0) = target(0) THEN IF y(0) = target(1) THEN GOSUB collect_target
@@ -78,8 +99,13 @@ RETURN
 
 collect_target:
 length = length + 1
+GOSUB spawn_target
+RETURN
+
+spawn_target:
 target(0) = INT(RND*w)
 target(1) = INT(RND*h)
+RETURN
 
 move_snake:
 FOR i=length-1 TO 1 STEP -1
@@ -96,7 +122,6 @@ IF button$="a" THEN GOSUB go_left
 IF button$="w" THEN GOSUB go_down
 IF button$="d" THEN GOSUB go_right
 IF button$="s" THEN GOSUB go_up
-IF button$="e" THEN GOTO lost
 RETURN
 
 go_right:
@@ -124,9 +149,8 @@ FOR i=length-1 TO 1 STEP -1
     CIRCLE (x(i) * 10, y(i) * 10), 7, i MOD 15,,,,F
     SLEEP 150
 NEXT i
-PRINT CHR$(1),"LOSER", CHR$(2)
-PRINT "YOUR SCORE ", length - 5
-PRINT "Press R to restart"
+GOSUB draw_game_over
+GOSUB draw_edge
 press_r:
 IF INKEY$<>"r" THEN GOTO press_r
 GOTO init
