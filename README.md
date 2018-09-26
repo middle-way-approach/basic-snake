@@ -1,4 +1,4 @@
-![Basic Snake](![alt text](https://raw.githubusercontent.com/middle-way-approach/basic-snake/master/snake.png) 
+![Basic Snake](https://raw.githubusercontent.com/middle-way-approach/basic-snake/master/snake.png) 
 
 This is a Snake game written in Googles [web-based BASIC interpreter](https://github.com/google/wwwbasic). Control the snake with WASD.
 
